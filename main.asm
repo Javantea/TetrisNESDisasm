@@ -1489,10 +1489,10 @@ drop_tetrimino:
         jmp     @ret
 
 framesPerDropTable:
-        .byte   $30,$2B,$26,$21,$1C,$17,$12,$0D
-        .byte   $08,$06,$05,$05,$05,$04,$04,$04
-        .byte   $03,$03,$03,$02,$02,$02,$02,$02
-        .byte   $02,$02,$02,$02,$02,$01
+        .byte   $60,$50,$4c,$42,$38,$2e,$24,$1a
+        .byte   $10,$0c,$0a,$0a,$0a,$08,$08,$08
+        .byte   $06,$06,$06,$04,$04,$04,$04,$04
+        .byte   $04,$04,$04,$04,$04,$02
 unreferenced_framesPerDropTable:
         .byte   $01,$01
 shift_tetrimino:

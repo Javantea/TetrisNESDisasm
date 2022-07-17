@@ -1,10 +1,10 @@
 # Tetris
 
-This is a disassembly of Tetris (NES).
+This is a disassembly of Tetris (NES). It is intentionally modified to slow down the game by a factor of 2.
 
 It builds the following rom:
 
-* Tetris (U) [!].nes `md5: ec58574d96bee8c8927884ae6e7a2508`
+* Tetris (U) [!].nes `md5: 32dc6805f37aafbd65dd08878880d044`
 
 To set up the repository, see [**INSTALL.md**](INSTALL.md).
 
