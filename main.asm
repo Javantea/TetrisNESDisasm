@@ -1472,7 +1472,7 @@ drop_tetrimino:
 @ret:   rts
 
 @lookupDropSpeed:
-        lda     #$01
+        lda     #$02
         ldx     levelNumber
         cpx     #$1D
         bcs     @noTableLookup
