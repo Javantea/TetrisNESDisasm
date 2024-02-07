@@ -508,10 +508,15 @@ gameMode_legalScreen:
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+; cnrom
+CNROM_CHR_LEGAL:
+        lda #1
+        sta CNROM_CHR_LEGAL+1
+        lda #%10011000
+;        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   legal_screen_palette
         jsr     bulkCopyToPpu
@@ -547,10 +552,12 @@ gameMode_titleScreen:
         sta     displayNextPiece
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+; cnrom
+        lda #%10011000
+;        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -621,10 +628,13 @@ gameMode_gameTypeMenu:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   game_type_menu_nametable
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+;        lda     #$00
+;        jsr     changeCHRBank0
+;        lda     #$00
+;        jsr     changeCHRBank1
+CNROM_CHR_MENU:
+        lda #1
+        sta CNROM_CHR_MENU+1
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
@@ -749,15 +759,29 @@ gameMode_levelMenu:
         inc     initRam
         lda     #$10
         jsr     setMMC1Control
+;cnrom
+CNROM_CHR_LEVEL:
+        lda #1
+        sta CNROM_CHR_LEVEL+1
+        ;lda currentPpuCtrl
+        ;and #%10011000
+        ;sta currentPpuCtrl
+;end of cnrom
         jsr     updateAudio2
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+;        lda     #$00
+;        jsr     changeCHRBank0
+;        lda     #$00
+;        jsr     changeCHRBank1
+; cnrom
+        lda #%10011000
+;        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -1027,10 +1051,19 @@ render_mode_menu_screens:
 gameModeState_initGameBackground:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$03
-        jsr     changeCHRBank0
-        lda     #$03
-        jsr     changeCHRBank1
+;        lda     #$03
+;        jsr     changeCHRBank0
+;        lda     #$03
+;        jsr     changeCHRBank1
+CNROM_CHR_GAME:
+        lda #1
+        sta CNROM_CHR_GAME+1
+; cnrom
+        lda #%10000000
+;        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   game_palette
         jsr     bulkCopyToPpu
@@ -1096,6 +1129,12 @@ gameModeState_initGameBackground:
         jmp     gameModeState_initGameBackground_finish
 
 gameModeState_initGameBackground_finish:
+;cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+;end cnrom
+        jsr     resetScroll
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
@@ -1352,10 +1391,16 @@ rngTable:
         .byte   $EF,$7B,$EF,$7C,$7D,$7D,$EF
         .byte   $EF
 gameModeState_updateCountersAndNonPlayerState:
-        lda     #$03
-        jsr     changeCHRBank0
-        lda     #$03
-        jsr     changeCHRBank1
+;        lda     #$03
+;        jsr     changeCHRBank0
+;        lda     #$03
+;        jsr     changeCHRBank1
+; cnrom
+;        lda #%10001000
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         lda     #$00
         sta     oamStagingLength
         inc     player1_fallTimer
@@ -2542,12 +2587,16 @@ render_mode_play_and_demo:
         sta     soundEffectSlot1Init
 @setPaletteColor:
         stx     PPUDATA
+resetScroll:
         ldy     #$00
         sty     ppuScrollX
         sty     PPUSCROLL
         ldy     #$00
         sty     ppuScrollY
         sty     PPUSCROLL
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
         rts
 
 pieceToPpuStatAddr:
@@ -3658,10 +3707,19 @@ L9E49:  ldx     player1_levelNumber
         lda     levelNumber
         cmp     #$09
         bne     L9E88
-        lda     #$01
-        jsr     changeCHRBank0
-        lda     #$01
-        jsr     changeCHRBank1
+;        lda     #$01
+;        jsr     changeCHRBank0
+;        lda     #$01
+;        jsr     changeCHRBank1
+; b-type xxx
+CNROM_CHR_B_END:
+        lda #0
+        sta CNROM_CHR_B_END+1
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   type_b_lvl9_ending_nametable
         jmp     L9EA4
@@ -4110,6 +4168,15 @@ highScoreEntryScreen:
         jsr     changeCHRBank0
         lda     #$00
         jsr     changeCHRBank1
+; high score xxx
+CNROM_CHR_HIGH:
+        lda #1
+        sta CNROM_CHR_HIGH+1
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -4128,6 +4195,7 @@ highScoreEntryScreen:
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
+;cnrom
         jsr     updateAudioWaitForNmiAndResetOamStaging
         lda     highScoreEntryRawPos
         asl     a
@@ -4930,10 +4998,19 @@ unreferenced_data6:
         .byte   $FC
 LA926:  jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$02
-        jsr     changeCHRBank0
-        lda     #$02
-        jsr     changeCHRBank1
+;        lda     #$02
+;        jsr     changeCHRBank0
+;        lda     #$02
+;        jsr     changeCHRBank1
+; rocket screen works with this added
+CNROM_CHR_ENDING:
+        lda #0
+        sta CNROM_CHR_ENDING+1
+; cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   type_a_ending_nametable
         jsr     bulkCopyToPpu
@@ -5436,51 +5513,53 @@ switch_s_plus_2a:
         rts
 
 setMMC1Control:
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
+; cnrom
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
         rts
 
 changeCHRBank0:
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
+; cnrom
+;       sta     MMC1_CHR0
+;       lsr     a
+;       sta     MMC1_CHR0
+;       lsr     a
+;       sta     MMC1_CHR0
+;       lsr     a
+;       sta     MMC1_CHR0
+;       lsr     a
+;       sta     MMC1_CHR0
         rts
 
 changeCHRBank1:
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
+;        sta     MMC1_CHR1
+;        lsr     a
+;        sta     MMC1_CHR1
+;        lsr     a
+;        sta     MMC1_CHR1
+;        lsr     a
+;        sta     MMC1_CHR1
+;        lsr     a
+;        sta     MMC1_CHR1
         rts
 
 changePRGBank:
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
+;        sta     MMC1_PRG
+;        lsr     a
+;        sta     MMC1_PRG
+;        lsr     a
+;        sta     MMC1_PRG
+;        lsr     a
+;        sta     MMC1_PRG
+;        lsr     a
+;        sta     MMC1_PRG
         rts
 
 game_palette:
@@ -5489,6 +5568,11 @@ game_palette:
         .byte   $3C,$00,$30,$0F,$35,$15,$22,$0F
         .byte   $35,$29,$26,$0F,$2C,$16,$29,$0F
         .byte   $3C,$00,$30,$FF
+;        .byte   $39,$39,$39,$39,$39,$39,$39,$39
+;        .byte   $39,$39,$39,$39,$39,$39,$39,$39
+;        .byte   $39,$39,$39,$39,$39,$39,$39,$39
+;        .byte   $39,$39,$39,$39,$39,$39,$39,$39
+;        .byte   $39,$39,$39,$FF
 legal_screen_palette:
         .byte   $3F,$00,$10,$0F,$27,$2A,$2B,$0F
         .byte   $3C,$2A,$22,$0F,$27,$2C,$29,$0F
