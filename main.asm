@@ -616,7 +616,7 @@ render_mode_legal_and_title_screens:
         rts
 
 gameMode_gameTypeMenu:
-        inc     initRam
+        ;inc     initRam
         lda     #$10
         jsr     setMMC1Control
         lda     #$01
@@ -751,7 +751,7 @@ L830B:  lda     #$FF
         jmp     L830B
 
 gameMode_levelMenu:
-        inc     initRam
+        ;inc     initRam
         lda     #$10
         jsr     setMMC1Control
 ;cnrom
@@ -1027,6 +1027,8 @@ render_mode_menu_screens:
         and     #$FC
         sta     currentPpuCtrl
         sta     PPUCTRL
+; a function inside of a function..
+resetScroll:
         lda     #$00
         sta     ppuScrollX
         sta     PPUSCROLL
@@ -1037,10 +1039,10 @@ render_mode_menu_screens:
 gameModeState_initGameBackground:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$03
-        jsr     changeCHRBank0
-        lda     #$03
-        jsr     changeCHRBank1
+        ;lda     #$03
+        ;jsr     changeCHRBank0
+        ;lda     #$03
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   game_palette
         jsr     bulkCopyToPpu
@@ -1111,6 +1113,7 @@ gameModeState_initGameBackground_finish:
         sta PPUCTRL
         sta currentPpuCtrl
 ;end cnrom
+        jsr     resetScroll
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
@@ -2568,7 +2571,7 @@ render_mode_play_and_demo:
         ldy     #$00
         sty     ppuScrollY
         sty     PPUSCROLL
-        lda #%10011000
+        lda #%10000000
         sta PPUCTRL
         sta currentPpuCtrl
         rts
@@ -3713,7 +3716,8 @@ L9EA4:  jsr     bulkCopyToPpu
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
+        ;cnrom
+        ;jsr     updateAudioWaitForNmiAndResetOamStaging
         lda     #$04
         sta     renderMode
         lda     #$0A
@@ -4125,7 +4129,7 @@ highScoreIndexToHighScoreNamesOffset:
 highScoreIndexToHighScoreScoresOffset:
         .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
 highScoreEntryScreen:
-        inc     initRam
+        ;inc     initRam
         lda     #$10
         jsr     setMMC1Control
         lda     #$09
@@ -5474,7 +5478,7 @@ switch_s_plus_2a:
         jmp     (tmp1)
 
         sei
-        inc     initRam
+        ;inc     initRam
         lda     #$1A
         jsr     setMMC1Control
         rts
