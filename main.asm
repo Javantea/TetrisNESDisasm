@@ -4130,27 +4130,22 @@ highScoreIndexToHighScoreScoresOffset:
         .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
 highScoreEntryScreen:
         ;inc     initRam
-        lda     #$10
-        jsr     setMMC1Control
+        ;lda     #$10
+        ;jsr     setMMC1Control
         lda     #$09
         jsr     setMusicTrack
         lda     #$02
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
 ; high score xxx
 CNROM_CHR_HIGH:
         lda #1
         sta CNROM_CHR_HIGH+1
-; cnrom
-        lda #%10011000
-        sta PPUCTRL
-        sta currentPpuCtrl
-; end cnrom
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -4169,7 +4164,14 @@ CNROM_CHR_HIGH:
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
+        ; cnrom
+        ;jsr     updateAudioWaitForNmiAndResetOamStaging
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+        lda #$00
+; end cnrom
         lda     highScoreEntryRawPos
         asl     a
         sta     generalCounter
