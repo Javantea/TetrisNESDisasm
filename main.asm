@@ -617,8 +617,8 @@ render_mode_legal_and_title_screens:
 
 gameMode_gameTypeMenu:
         ;inc     initRam
-        lda     #$10
-        jsr     setMMC1Control
+        ;lda     #$10
+        ;jsr     setMMC1Control
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
@@ -752,22 +752,24 @@ L830B:  lda     #$FF
 
 gameMode_levelMenu:
         ;inc     initRam
-        lda     #$10
-        jsr     setMMC1Control
+        ;lda     #$10
+        ;jsr     setMMC1Control
 ;cnrom
 CNROM_CHR_LEVEL:
         lda #1
         sta CNROM_CHR_LEVEL+1
 ;end of cnrom
+        lda #%10011000
+        sta currentPpuCtrl
         jsr     updateAudio2
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -1382,10 +1384,13 @@ rngTable:
         .byte   $EF,$7B,$EF,$7C,$7D,$7D,$EF
         .byte   $EF
 gameModeState_updateCountersAndNonPlayerState:
-        lda     #$03
-        jsr     changeCHRBank0
-        lda     #$03
-        jsr     changeCHRBank1
+        ;lda     #$03
+        ;jsr     changeCHRBank0
+        ;lda     #$03
+        ;jsr     changeCHRBank1
+CNROM_CHR_PS:
+        lda #1
+        sta CNROM_CHR_PS
 ; cnrom
         lda #%10000000
         sta PPUCTRL
@@ -1524,10 +1529,10 @@ drop_tetrimino:
         jmp     @ret
 
 framesPerDropTable:
-        .byte   $60,$50,$4c,$42,$38,$2e,$24,$1a
-        .byte   $10,$0c,$0a,$0a,$0a,$08,$08,$08
-        .byte   $06,$06,$06,$04,$04,$04,$04,$04
-        .byte   $04,$04,$04,$04,$04,$02
+        .byte   $30,$2B,$26,$21,$1C,$17,$12,$0D
+        .byte   $08,$06,$05,$05,$05,$04,$04,$04
+        .byte   $03,$03,$03,$02,$02,$02,$02,$02
+        .byte   $02,$02,$02,$02,$02,$01
 unreferenced_framesPerDropTable:
         .byte   $01,$01
 shift_tetrimino:
@@ -3717,9 +3722,18 @@ L9E88:  ldx     #$03
         beq     L9E96
         ldx     #$02
 L9E96:  txa
-        jsr     changeCHRBank0
-        lda     #$02
-        jsr     changeCHRBank1
+; b-type xxx
+CNROM_CHR_B_END2:
+        lda #0
+        sta CNROM_CHR_B_END2+1
+; cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
+        ;jsr     changeCHRBank0
+        ;lda     #$02
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   type_b_ending_nametable
 L9EA4:  jsr     bulkCopyToPpu
@@ -4022,16 +4036,6 @@ handleHighScoreIfNecessary:
         beq     @ret
         jmp     @compareWithPos
 @ret:
-; FIXME: not working
-CNROM_CHR_SMALL:
-        lda #1
-        sta CNROM_CHR_SMALL+1
-; cnrom
-        lda #%10011000
-        sta PPUCTRL
-        sta currentPpuCtrl
-        lda #$00
-; end cnrom
         rts
 
 adjustHighScores:
@@ -5503,8 +5507,8 @@ switch_s_plus_2a:
 
         sei
         ;inc     initRam
-        lda     #$1A
-        jsr     setMMC1Control
+        ;lda     #$1A
+        ;jsr     setMMC1Control
         rts
 
         rts
@@ -7458,14 +7462,14 @@ reset:  cld
         dex
         txs
         inc     reset
-        lda     #$10
-        jsr     setMMC1Control
-        lda     #$00
-        jsr     changeCHRBank0
-        lda     #$00
-        jsr     changeCHRBank1
-        lda     #$00
-        jsr     changePRGBank
+        ;lda     #$10
+        ;jsr     setMMC1Control
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changePRGBank
         jmp     initRam
 
 .include "data/unreferenced_data5.asm"
