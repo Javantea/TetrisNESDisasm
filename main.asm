@@ -480,10 +480,15 @@ gameMode_legalScreen:
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
+; cnrom
+CNROM_CHR_LEGAL:
+        lda #1
+        sta CNROM_CHR_LEGAL+1
+        lda #%10011000
+;        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   legal_screen_palette
         jsr     bulkCopyToPpu
@@ -519,10 +524,11 @@ gameMode_titleScreen:
         sta     displayNextPiece
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -582,9 +588,9 @@ render_mode_legal_and_title_screens:
         rts
 
 gameMode_gameTypeMenu:
-        inc     initRam
-        lda     #MMC1_4KCHR_32KPRG_H_MIRROR
-        jsr     setMMC1Control
+        ;inc     initRam
+        ;lda     #$10
+        ;jsr     setMMC1Control
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
@@ -593,10 +599,9 @@ gameMode_gameTypeMenu:
         .addr   menu_palette
         jsr     bulkCopyToPpu
         .addr   game_type_menu_nametable
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
+CNROM_CHR_MENU:
+        lda #1
+        sta CNROM_CHR_MENU+1
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
@@ -718,18 +723,25 @@ L830B:  lda     #$FF
         jmp     L830B
 
 gameMode_levelMenu:
-        inc     initRam
-        lda     #MMC1_4KCHR_32KPRG_H_MIRROR
-        jsr     setMMC1Control
+        ;inc     initRam
+        ;lda     #$10
+        ;jsr     setMMC1Control
+;cnrom
+CNROM_CHR_LEVEL:
+        lda #1
+        sta CNROM_CHR_LEVEL+1
+;end of cnrom
+        lda #%10011000
+        sta currentPpuCtrl
         jsr     updateAudio2
         lda     #$01
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -989,6 +1001,8 @@ render_mode_menu_screens:
         and     #$FC
         sta     currentPpuCtrl
         sta     PPUCTRL
+; a function inside of a function..
+resetScroll:
         lda     #$00
         sta     ppuScrollX
         sta     PPUSCROLL
@@ -999,10 +1013,10 @@ render_mode_menu_screens:
 gameModeState_initGameBackground:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_GAME
-        jsr     changeCHRBank0
-        lda     #CHR_GAME
-        jsr     changeCHRBank1
+        ;lda     #$03
+        ;jsr     changeCHRBank0
+        ;lda     #$03
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   game_palette
         jsr     bulkCopyToPpu
@@ -1068,6 +1082,12 @@ gameModeState_initGameBackground:
         jmp     gameModeState_initGameBackground_finish
 
 gameModeState_initGameBackground_finish:
+;cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+;end cnrom
+        jsr     resetScroll
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
@@ -1116,6 +1136,18 @@ gameModeState_initGameState:
         sta     player1_score
         sta     player1_score+1
         sta     player1_score+2
+@staticSeed:
+        ; start of static seed code
+        ; 71ad is the seed. 00 00 are the spawnID and spawnCount for new fresh memory with no games played.
+        lda     #$71
+        sta     rng_seed
+        lda     #$ad
+        sta     rng_seed+1
+        lda     #$00
+        sta     spawnID
+        sta     spawnCount
+        ; end of static seed code
+        ;; make very sure that a = 0 here and x y haven't been modified.
         sta     player2_score
         sta     player2_score+1
         sta     player2_score+2
@@ -1341,10 +1373,18 @@ rngTable:
         .byte   tileEmpty,tile1,tileEmpty,tile2
         .byte   tile3,tile3,tileEmpty,tileEmpty
 gameModeState_updateCountersAndNonPlayerState:
-        lda     #CHR_GAME
-        jsr     changeCHRBank0
-        lda     #CHR_GAME
-        jsr     changeCHRBank1
+        ;lda     #$03
+        ;jsr     changeCHRBank0
+        ;lda     #$03
+        ;jsr     changeCHRBank1
+CNROM_CHR_PS:
+        lda #1
+        sta CNROM_CHR_PS
+; cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         lda     #$00
         sta     oamStagingLength
         inc     player1_fallTimer
@@ -1482,7 +1522,7 @@ drop_tetrimino:
 @ret:   rts
 
 @lookupDropSpeed:
-        lda     #$01
+        lda     #$02
         ldx     levelNumber
         cpx     #$1D
         bcs     @noTableLookup
@@ -2567,6 +2607,9 @@ render_mode_play_and_demo:
         ldy     #$00
         sty     ppuScrollY
         sty     PPUSCROLL
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
         rts
 
 pieceToPpuStatAddr:
@@ -3696,11 +3739,15 @@ endingAnimationB:
         lda     levelNumber
         cmp     #$09
         bne     @checkPenguinOrOstrichEnding
-        ; castle ending for level 9/19
-        lda     #CHR_TYPEB_ENDING
-        jsr     changeCHRBank0
-        lda     #CHR_TYPEB_ENDING
-        jsr     changeCHRBank1
+; b-type xxx
+CNROM_CHR_B_END:
+        lda #0
+        sta CNROM_CHR_B_END+1
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   type_b_lvl9_ending_nametable
         jmp     @startAnimation
@@ -3708,16 +3755,24 @@ endingAnimationB:
 @checkPenguinOrOstrichEnding:
         ldx     #CHR_GAME
         lda     levelNumber
-        cmp     #$02    ; Penguin ending for level 2/12
+        cmp     #$02
         beq     @normalEnding
-        cmp     #$06    ; Ostrich for 6/16
+        cmp     #$06
         beq     @normalEnding
-        ldx     #CHR_TYPEA_ENDING
-@normalEnding:
-        txa
-        jsr     changeCHRBank0
-        lda     #CHR_TYPEA_ENDING
-        jsr     changeCHRBank1
+        ldx     #$02
+@normalEnding:  txa
+; b-type xxx
+CNROM_CHR_B_END2:
+        lda #0
+        sta CNROM_CHR_B_END2+1
+; cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
+        ;jsr     changeCHRBank0
+        ;lda     #$02
+        ;jsr     changeCHRBank1
         jsr     bulkCopyToPpu
         .addr   type_b_ending_nametable
 @startAnimation:
@@ -3727,7 +3782,8 @@ endingAnimationB:
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
+        ;cnrom
+        ;jsr     updateAudioWaitForNmiAndResetOamStaging
         lda     #$04
         sta     renderMode
         lda     #$0A
@@ -4025,8 +4081,8 @@ handleHighScoreIfNecessary:
         cmp     #$07
         beq     @ret
         jmp     @compareWithPos
-
-@ret:   rts
+@ret:
+        rts
 
 adjustHighScores:
         lda     highScoreEntryRawPos
@@ -4145,19 +4201,23 @@ highScoreIndexToHighScoreNamesOffset:
 highScoreIndexToHighScoreScoresOffset:
         .byte   $00,$03,$06,$09,$0C,$0F,$12,$15
 highScoreEntryScreen:
-        inc     initRam
-        lda     #MMC1_4KCHR_32KPRG_H_MIRROR
-        jsr     setMMC1Control
+        ;inc     initRam
+        ;lda     #$10
+        ;jsr     setMMC1Control
         lda     #$09
         jsr     setMusicTrack
         lda     #$02
         sta     renderMode
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
+; high score xxx
+CNROM_CHR_HIGH:
+        lda #1
+        sta CNROM_CHR_HIGH+1
         jsr     bulkCopyToPpu
         .addr   menu_palette
         jsr     bulkCopyToPpu
@@ -4176,7 +4236,14 @@ highScoreEntryScreen:
         jsr     waitForVBlankAndEnableNmi
         jsr     updateAudioWaitForNmiAndResetOamStaging
         jsr     updateAudioWaitForNmiAndEnablePpuRendering
-        jsr     updateAudioWaitForNmiAndResetOamStaging
+        ; cnrom
+        ;jsr     updateAudioWaitForNmiAndResetOamStaging
+; cnrom
+        lda #%10011000
+        sta PPUCTRL
+        sta currentPpuCtrl
+        lda #$00
+; end cnrom
         lda     highScoreEntryRawPos
         asl     a
         sta     generalCounter
@@ -5024,10 +5091,19 @@ unreferenced_data6:
 endingAnimationA:
         jsr     updateAudioWaitForNmiAndDisablePpuRendering
         jsr     disableNmi
-        lda     #CHR_TYPEA_ENDING
-        jsr     changeCHRBank0
-        lda     #CHR_TYPEA_ENDING
-        jsr     changeCHRBank1
+;        lda     #$02
+;        jsr     changeCHRBank0
+;        lda     #$02
+;        jsr     changeCHRBank1
+; rocket screen works with this added
+CNROM_CHR_ENDING:
+        lda #0
+        sta CNROM_CHR_ENDING+1
+; cnrom
+        lda #%10000000
+        sta PPUCTRL
+        sta currentPpuCtrl
+; end cnrom
         jsr     bulkCopyToPpu
         .addr   type_a_ending_nametable
         jsr     bulkCopyToPpu
@@ -5525,59 +5601,59 @@ switch_s_plus_2a:
         jmp     (tmp1)
 
         sei
-        inc     initRam
-        lda     #$1A
-        jsr     setMMC1Control
+        ;inc     initRam
+        ;lda     #$1A
+        ;jsr     setMMC1Control
         rts
 
         rts
 
 setMMC1Control:
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        lsr     a
-        sta     MMC1_Control
-        rts
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         lsr     a
+;         sta     MMC1_Control
+;         rts
 
 changeCHRBank0:
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        lsr     a
-        sta     MMC1_CHR0
-        rts
+;         sta     MMC1_CHR0
+;         lsr     a
+;         sta     MMC1_CHR0
+;         lsr     a
+;         sta     MMC1_CHR0
+;         lsr     a
+;         sta     MMC1_CHR0
+;         lsr     a
+;         sta     MMC1_CHR0
+;         rts
 
 changeCHRBank1:
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        lsr     a
-        sta     MMC1_CHR1
-        rts
+;         sta     MMC1_CHR1
+;         lsr     a
+;         sta     MMC1_CHR1
+;         lsr     a
+;         sta     MMC1_CHR1
+;         lsr     a
+;         sta     MMC1_CHR1
+;         lsr     a
+;         sta     MMC1_CHR1
+;         rts
 
 changePRGBank:
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
-        lsr     a
-        sta     MMC1_PRG
+;         sta     MMC1_PRG
+;         lsr     a
+;         sta     MMC1_PRG
+;         lsr     a
+;         sta     MMC1_PRG
+;         lsr     a
+;         sta     MMC1_PRG
+;         lsr     a
+;         sta     MMC1_PRG
         rts
 
 game_palette:
@@ -7533,14 +7609,14 @@ reset:  cld
         dex
         txs
         inc     reset
-        lda     #MMC1_4KCHR_32KPRG_H_MIRROR
-        jsr     setMMC1Control
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank0
-        lda     #CHR_TITLE_MENU
-        jsr     changeCHRBank1
-        lda     #PRG_32K_BANK
-        jsr     changePRGBank
+        ;lda     #$10
+        ;jsr     setMMC1Control
+        ;lda     #$00
+        ;jsr     changeCHRBank0
+        ;lda     #$00
+        ;jsr     changeCHRBank1
+        ;lda     #$00
+        ;jsr     changePRGBank
         jmp     initRam
 
 .include "data/unreferenced_data5.asm"
