@@ -1136,18 +1136,6 @@ gameModeState_initGameState:
         sta     player1_score
         sta     player1_score+1
         sta     player1_score+2
-@staticSeed:
-        ; start of static seed code
-        ; 71ad is the seed. 00 00 are the spawnID and spawnCount for new fresh memory with no games played.
-        lda     #$71
-        sta     rng_seed
-        lda     #$ad
-        sta     rng_seed+1
-        lda     #$00
-        sta     spawnID
-        sta     spawnCount
-        ; end of static seed code
-        ;; make very sure that a = 0 here and x y haven't been modified.
         sta     player2_score
         sta     player2_score+1
         sta     player2_score+2
@@ -3740,9 +3728,9 @@ endingAnimationB:
         cmp     #$09
         bne     @checkPenguinOrOstrichEnding
 ; b-type xxx
-CNROM_CHR_B_END:
+@CNROM_CHR_B_END:
         lda #0
-        sta CNROM_CHR_B_END+1
+        sta @CNROM_CHR_B_END+1
 ; cnrom
         lda #%10011000
         sta PPUCTRL
@@ -3762,9 +3750,9 @@ CNROM_CHR_B_END:
         ldx     #$02
 @normalEnding:  txa
 ; b-type xxx
-CNROM_CHR_B_END2:
+@CNROM_CHR_B_END2:
         lda #0
-        sta CNROM_CHR_B_END2+1
+        sta @CNROM_CHR_B_END2+1
 ; cnrom
         lda #%10000000
         sta PPUCTRL
